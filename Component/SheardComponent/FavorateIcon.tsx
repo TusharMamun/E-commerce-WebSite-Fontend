@@ -1,34 +1,60 @@
 "use client"
-import React, { useState } from 'react'
+import { addTofavorate } from '@/Redux/sofislise'
+import { ProductTyps, statType } from '@/type'
+import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast'
+import { MdFavorite, MdFavoriteBorder } from 'react-icons/md'
+import { useDispatch, useSelector } from 'react-redux'
 
-const FavorateIcon = () => {
-      const [isFavorite, setIsFavorite] = useState(false)
-        const toggleFavorite = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    setIsFavorite(!isFavorite)
-  }
+const FavorateIcon = ({ product }: { product: ProductTyps }) => {
+
+  const [existingProduct, setExistingProduct] = useState<ProductTyps | null>(null);
+  const { favorate } = useSelector((state: statType) => state.sofi)
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    const availableProduct = favorate?.find((item) => item._id === product?._id);
+if(availableProduct){
+  setExistingProduct(availableProduct)
+}else{
+  setExistingProduct(null)
+}
+  }, [favorate, product,existingProduct,dispatch]);
+
+  const handleFavorite = (): void => {
+    // Determine if product is currently in favorites BEFORE dispatching
+
+    
+    // Dispatch the action
+    dispatch(addTofavorate(product));
+
+    // Show appropriate toast message based on current state
+    if (existingProduct) {
+      toast.success("❤️ Removed from favorites", {
+        position: "top-center",
+      });
+    } else {
+      toast.success("❤️ Added to favorites", {
+        position: "top-center",
+      });
+    }
+  };
+
   return (
-<>
-        <button 
-          onClick={toggleFavorite}
-          className='absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:scale-110 transition-transform duration-200 z-20 group'
-          aria-label={isFavorite ? "Remove from wishlist" : "Add to wishlist"}
-        >
-          <svg 
-            className={`w-5 h-5 transition-colors duration-300 ${isFavorite ? 'text-red-500 fill-red-500' : 'text-gray-600 group-hover:text-red-500'}`}
-            fill={isFavorite ? "currentColor" : "none"}
-            stroke="currentColor" 
-            viewBox="0 0 24 24"
-          >
-            <path 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              strokeWidth={2} 
-              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" 
-            />
-          </svg>
-        </button></>
+  <button 
+  onClick={handleFavorite}
+  className='absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:scale-110 transition-transform duration-200 z-20 group'
+>
+  {existingProduct ? (
+    <MdFavorite
+      className="text-red-500 text-xl transition-colors duration-200" 
+    />
+  ) : (
+    <MdFavoriteBorder
+      className="text-gray-600 group-hover:text-red-500 text-xl transition-colors duration-200" 
+    />
+  )}
+</button>
   )
 }
 

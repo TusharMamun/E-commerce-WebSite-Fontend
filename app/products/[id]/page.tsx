@@ -29,7 +29,9 @@ interface Props {
 }
 
 const ProductDetails = async ({ params }: Props) => {
-  const { id } = await params;
+  const { id} = await params;
+console.log(typeof(id))
+ 
   const endpoint = `http://localhost:5000/api/v1/products/${id}`;
   const response = await getData(endpoint);
   const productdata = response.data;
